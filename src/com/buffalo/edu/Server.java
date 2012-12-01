@@ -3,12 +3,15 @@ package com.buffalo.edu;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import javax.net.ServerSocketFactory;
 
 import com.buffalo.edu.util.Message;
+
+import com.buffalo.edu.ServerConnections;
 
 
 
@@ -18,6 +21,8 @@ public class Server implements Runnable
 	public Server(int port)throws IOException{
 		this.socket = ServerSocketFactory.getDefault().createServerSocket(port);
 		ServerConnections.socket = this.socket;
+		ServerConnections.IP_ADDRESS = InetAddress.getLocalHost().getHostAddress();
+		ServerConnections.HOST_NAME = InetAddress.getLocalHost().getHostName();
 		
 	}
 	
@@ -38,11 +43,20 @@ public class Server implements Runnable
 					System.out.println("inside if loop for incoming");
 					if(message.getPayLoad().contains("connect")){
 					System.out.println("inside if loop : connect");
-					Runnable connectionHandler = new ConnectionHandler(client);
+					ConnectionHandler connectionHandler = new ConnectionHandler(client);
 					new Thread(connectionHandler).start(); 
+					ServerConnections.incomingConnectionCounter++;
+					Connection conn = new Connection();
+					conn.connectionId = ServerConnections.incomingConnectionCounter;
+					conn.ip = client.getInetAddress().getHostAddress();
+					conn.hostname = client.getInetAddress().getHostName();
+					conn.localPort = client.getLocalPort();
+					conn.remotePort = client.getPort();
+					conn.setHandler(connectionHandler);
+					ServerConnections.activeConnection.add(conn);
 					Message mess = new Message();
 					ObjectOutputStream outstr = new ObjectOutputStream(client.getOutputStream());
-					message.setPayLoad("SIMPELLA/0.6 200 OK \r\n");
+					mess.setPayLoad("SIMPELLA/0.6 200 OK \r\n");
 					outstr.writeObject(mess);
 					outstr.flush();
 					}
