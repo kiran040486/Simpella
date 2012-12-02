@@ -67,12 +67,8 @@ public class Simpella
 				response  = service.connect(splits[1]);
 			}
 			else if(line.contains("update")){
+				System.out.println("inside if : update");
 				response = service.doUpdate();
-			}else if(line.contains("info")){
-				for(int i=0; i < ServerConnections.activeConnection.size();i++){
-					System.out.println(">>>>>"+ ServerConnections.activeConnection.get(i).ip);
-					System.out.println(">>>>>"+ ServerConnections.activeConnection.get(i).localPort);
-				}
 			}
 			else{
 				System.out.println("Invalid Command");
@@ -90,6 +86,7 @@ public class Simpella
 	private static void close() {
 		
 		try {
+			if(ServerConnections.socket.isClosed())
 			ServerConnections.socket.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

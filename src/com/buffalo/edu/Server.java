@@ -3,15 +3,11 @@ package com.buffalo.edu;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+import java.net.InetAddress;
 import javax.net.ServerSocketFactory;
-
 import com.buffalo.edu.util.Message;
-
-import com.buffalo.edu.ServerConnections;
 
 
 
@@ -38,7 +34,7 @@ public class Server implements Runnable
 				Message message = (Message) is.readObject();
 								
 				System.out.println(message.getPayLoad().toString());
-				if(ServerConnections.incomingConnectionCounter < 4){
+				if(ServerConnections.incomingConnectionCounter < 3){
 					
 					System.out.println("inside if loop for incoming");
 					if(message.getPayLoad().contains("connect")){
@@ -48,8 +44,8 @@ public class Server implements Runnable
 					ServerConnections.incomingConnectionCounter++;
 					Connection conn = new Connection();
 					conn.connectionId = ServerConnections.incomingConnectionCounter;
-					conn.ip = client.getInetAddress().getHostAddress();
-					conn.hostname = client.getInetAddress().getHostName();
+					conn.ip = InetAddress.getLocalHost().getHostAddress();
+					conn.hostname = InetAddress.getLocalHost().getHostName();
 					conn.localPort = client.getLocalPort();
 					conn.remotePort = client.getPort();
 					conn.setHandler(connectionHandler);

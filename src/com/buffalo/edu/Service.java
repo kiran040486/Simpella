@@ -3,10 +3,17 @@ package com.buffalo.edu;
 import java.io.File;
 
 import com.buffalo.edu.util.FileOperations;
+import com.buffalo.edu.util.Message;
 
 public class Service {
 	
 	public String getInfo(String input){
+		
+		for(int i=0;i< ServerConnections.activeConnection.size(); i++){
+			System.out.println(">>>>>>>"+ ServerConnections.activeConnection.get(i).hostname);
+			System.out.println(">>>>>>>"+ ServerConnections.activeConnection.get(i).ip);
+			
+		}
 		
 		return null;
 	}
@@ -72,18 +79,30 @@ public class Service {
 	}
 
 	public String doUpdate() {
+		
+		System.out.println("Inside : doUpdate ");
 		// TODO Auto-generated method stub
-		Byte[] message = new Byte[24];
-		String mess = message.toString();
+		Message message = new Message(23);
+		byte [] header = message.getHeader();
+		header[8] = (byte) 0xff;
+		header[15] = (byte) 00;
+		header[16] = (byte) 0x00;
+		String value = new String(header);
+		System.out.println(">>>>" + value);
+		
+		message.setHeader(header);
+		String response =null;
 		 
 		for(int i=0 ; i< ServerConnections.activeConnection.size() ; i++){
+			System.out.println("inside for : doUpdate");
 			
 			Connection newconn = ServerConnections.activeConnection.get(i);
 			ConnectionHandler handle = newconn.getHandler();
-			handle.send(mess);
+			response = handle.send(message);
+			System.out.println(response);
 		}
 		
-		return null;
+		return response;
 	}
 	
 	
